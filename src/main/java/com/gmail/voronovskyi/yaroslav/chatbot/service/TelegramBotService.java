@@ -1,6 +1,7 @@
 package com.gmail.voronovskyi.yaroslav.chatbot.service;
 
 import com.gmail.voronovskyi.yaroslav.chatbot.config.AppConfig;
+import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -10,6 +11,8 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
@@ -61,6 +64,10 @@ public class TelegramBotService extends TelegramLongPollingBot {
                     startCommandReceived(chatId, name);
                     break;
 
+//                case "/mydata":
+////                    userService.getByChatId(update.getMessage());
+//                    break;
+
                 case "/help":
                     sendMessage(chatId, HELP_TEXT);
                     break;
@@ -72,7 +79,8 @@ public class TelegramBotService extends TelegramLongPollingBot {
     }
 
     private void startCommandReceived(long chatId, String name) {
-        String answer = "Hi, " + name + ", nice to meet you!";
+        String answer = EmojiParser.parseToUnicode("Hi, " + name + ", nice to meet you! " + ":blush:");
+//        String answer = "Hi, " + name + ", nice to meet you!";
         log.info("Replied to user {}", name);
         sendMessage(chatId, answer);
     }
@@ -81,6 +89,25 @@ public class TelegramBotService extends TelegramLongPollingBot {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
         message.setText(textToSend);
+
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        List<KeyboardRow> keyboardRowsList = new ArrayList<>();
+        KeyboardRow keyboardRow = new KeyboardRow();
+        keyboardRow.add("weather");
+        keyboardRow.add("get random joke");
+
+        keyboardRowsList.add(keyboardRow);
+
+        keyboardRow = new KeyboardRow();
+        keyboardRow.add("register");
+        keyboardRow.add("check my data");
+        keyboardRow.add("delete my data");
+
+        keyboardRowsList.add(keyboardRow);
+
+        replyKeyboardMarkup.setKeyboard(keyboardRowsList);
+        message.setReplyMarkup(replyKeyboardMarkup);
+
 
         try {
             execute(message);

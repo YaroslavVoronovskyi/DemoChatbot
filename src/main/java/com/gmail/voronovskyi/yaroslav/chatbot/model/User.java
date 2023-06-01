@@ -6,10 +6,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Data
 @ToString
@@ -26,5 +27,8 @@ public class User {
     private String firstName;
     private String lastName;
     private String userName;
-    private Timestamp registeredAt;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime registeredAt;
+//    private Timestamp registeredAt;
 }

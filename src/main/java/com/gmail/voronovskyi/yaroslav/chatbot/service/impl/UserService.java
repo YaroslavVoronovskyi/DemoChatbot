@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -34,10 +34,15 @@ public class UserService implements IUserService {
                     .firstName(chat.getFirstName())
                     .lastName(chat.getLastName())
                     .userName(chat.getUserName())
-                    .registeredAt(new Timestamp(System.currentTimeMillis()))
+                    .registeredAt(LocalDateTime.now())
                     .build();
             userRepository.save(user);
             log.info("User saved: {}", user);
         }
+    }
+
+    @Override
+    public User getByChatId(Message message) {
+        return userRepository.getReferenceById(message.getChatId());
     }
 }
