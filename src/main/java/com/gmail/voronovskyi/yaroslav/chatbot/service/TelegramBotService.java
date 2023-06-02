@@ -2,10 +2,12 @@ package com.gmail.voronovskyi.yaroslav.chatbot.service;
 
 import com.gmail.voronovskyi.yaroslav.chatbot.Constants;
 import com.gmail.voronovskyi.yaroslav.chatbot.config.AppConfig;
+import com.gmail.voronovskyi.yaroslav.chatbot.model.Advertisement;
 import com.gmail.voronovskyi.yaroslav.chatbot.model.User;
 import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
@@ -29,11 +31,13 @@ public class TelegramBotService extends TelegramLongPollingBot {
 
     private final AppConfig config;
     private final IUserService userService;
+    private final IAdvertisementService advertisementService;
 
     @Autowired
-    public TelegramBotService(AppConfig config, IUserService userService) {
+    public TelegramBotService(AppConfig config, IUserService userService, IAdvertisementService advertisementService) {
         this.config = config;
         this.userService = userService;
+        this.advertisementService = advertisementService;
         List<BotCommand> botCommandsList = new ArrayList<>();
         botCommandsList.add(new BotCommand("/start", "get a welcome message"));
         botCommandsList.add(new BotCommand("/register", "get you register"));
@@ -60,7 +64,7 @@ public class TelegramBotService extends TelegramLongPollingBot {
                 var textToSend = EmojiParser.parseToUnicode(messageText.substring(messageText.indexOf(" ")));
                 var users = userService.getAll();
                 for (User user : users) {
-                    prepareAndMessage(user.getChatId(), textToSend);
+                    prepareAndSendMessage(user.getChatId(), textToSend);
                 }
             } else {
                 switch (messageText) {
@@ -75,11 +79,11 @@ public class TelegramBotService extends TelegramLongPollingBot {
                         break;
 
                     case "/help":
-                        prepareAndMessage(chatId, Constants.HELP_TEXT);
+                        prepareAndSendMessage(chatId, Constants.HELP_TEXT);
                         break;
 
                     default:
-                        prepareAndMessage(chatId, "Sorry, command was not recognized ...");
+                        prepareAndSendMessage(chatId, "Sorry, command was not recognized ...");
                 }
             }
         } else if (update.hasCallbackQuery()) {
@@ -156,7 +160,7 @@ public class TelegramBotService extends TelegramLongPollingBot {
         executeMessage(message);
     }
 
-    private void prepareAndMessage(long chatId, String textToSend) {
+    private void prepareAndSendMessage(long chatId, String textToSend) {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
         message.setText(textToSend);
@@ -180,6 +184,18 @@ public class TelegramBotService extends TelegramLongPollingBot {
             execute(editMessageText);
         } catch (TelegramApiException exception) {
             log.error(Constants.ERROR_MESSAGE, exception.getMessage());
+        }
+    }
+
+    @Scheduled(cron = "${cron.scheduler}")
+    private void sendAdvertisements() {
+        var advertisements = advertisementService.getAll();
+        var users = userService.getAll();
+
+        for (Advertisement advertisement : advertisements) {
+            for (User user : users) {
+                prepareAndSendMessage(user.getChatId(), advertisement.getMessage());
+            }
         }
     }
 

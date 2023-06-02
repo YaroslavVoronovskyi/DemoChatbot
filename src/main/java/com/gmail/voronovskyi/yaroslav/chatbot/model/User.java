@@ -30,5 +30,4 @@ public class User {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime registeredAt;
-//    private Timestamp registeredAt;
 }
