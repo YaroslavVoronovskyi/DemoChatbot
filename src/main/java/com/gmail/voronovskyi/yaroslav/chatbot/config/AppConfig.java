@@ -15,4 +15,7 @@ public class AppConfig {
 
     @Value("${bot.token}")
     private String botToken;
+
+    @Value("${bot.owner}")
+    private Long ownerId;
 }
