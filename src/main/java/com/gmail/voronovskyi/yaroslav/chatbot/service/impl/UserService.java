@@ -43,11 +43,6 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User getByChatId(Message message) {
-        return userRepository.getReferenceById(message.getChatId());
-    }
-
-    @Override
     public List<User> getAll() {
         return userRepository.findAll();
     }

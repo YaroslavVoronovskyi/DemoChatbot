@@ -10,6 +10,5 @@ import java.util.List;
 public interface IUserService {
 
     void registerUser(Message message);
-    User getByChatId(Message message);
     List<User> getAll();
 }
