@@ -10,7 +10,6 @@ public class Constants {
             "Type /deletedata to delete stored data about yourself \n\n" +
             "Type /help to see this message again \n\n" +
             "Type /settings to set your preference";
-
     public static final String YES_BUTTON = "YES_BUTTON";
     public static final String NO_BUTTON = "NO_BUTTON";
     public static final String ERROR_MESSAGE = "Error occurred: {}";

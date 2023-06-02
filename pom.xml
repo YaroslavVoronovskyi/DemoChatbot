@@ -18,6 +18,7 @@
 	<properties>
 		<java.version>11</java.version>
 		<org.telegram.telegrambots.version>6.5.0</org.telegram.telegrambots.version>
+		<com.vdurmont.emoji-java.vrtsion>5.1.1</com.vdurmont.emoji-java.vrtsion>
 	</properties>
 
 	<dependencies>
@@ -29,13 +30,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.telegram</groupId>
 			<artifactId>telegrambots</artifactId>
 			<version>${org.telegram.telegrambots.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
@@ -54,7 +53,7 @@
 		<dependency>
 			<groupId>com.vdurmont</groupId>
 			<artifactId>emoji-java</artifactId>
-			<version>5.1.1</version>
+			<version>${com.vdurmont.emoji-java.vrtsion}</version>
 		</dependency>
 	</dependencies>
 
@@ -64,7 +63,6 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-<!--					<executable>true</executable>-->
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
@@ -75,5 +73,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

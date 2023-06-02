@@ -12,7 +12,6 @@ import org.telegram.telegrambots.meta.generics.LongPollingBot;
 import org.telegram.telegrambots.meta.generics.TelegramBot;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
-
 @Data
 @Slf4j
 @Component
@@ -28,7 +27,6 @@ public class BotInitializer {
             telegramBotsApi.registerBot((LongPollingBot) bot);
         } catch (TelegramApiException exception) {
             log.error("Error occurred: {}", exception.getMessage());
-//            throw new RuntimeException("Exception ....");
         }
     }
 }
