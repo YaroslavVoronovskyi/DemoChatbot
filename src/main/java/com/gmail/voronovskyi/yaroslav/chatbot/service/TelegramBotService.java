@@ -8,10 +8,13 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -25,10 +28,14 @@ public class TelegramBotService extends TelegramLongPollingBot {
     private static final String HELP_TEXT = "This bot is created to demonstrate Spring capabilities. \n\n" +
             "You can execute commands from the main menu on the left or by typing command: \n\n" +
             "Type /start to see a welcome message \n\n" +
+            "Type /register to register \n\n" +
             "Type /mydata to see data stored about yourself \n\n" +
             "Type /deletedata to delete stored data about yourself \n\n" +
             "Type /help to see this message again \n\n" +
             "Type /settings to set your preference";
+
+    private static final String YES_BUTTON = "YES_BUTTON";
+    private static final String NO_BUTTON = "NO_BUTTON";
     private final AppConfig config;
     private final IUserService userService;
 
@@ -38,6 +45,7 @@ public class TelegramBotService extends TelegramLongPollingBot {
         this.userService = userService;
         List<BotCommand> botCommandsList = new ArrayList<>();
         botCommandsList.add(new BotCommand("/start", "get a welcome message"));
+        botCommandsList.add(new BotCommand("/register", "get you register"));
         botCommandsList.add(new BotCommand("/mydata", "get your data store"));
         botCommandsList.add(new BotCommand("/deletedata", "delete my data"));
         botCommandsList.add(new BotCommand("/help", "info how to use this bot"));
@@ -64,9 +72,9 @@ public class TelegramBotService extends TelegramLongPollingBot {
                     startCommandReceived(chatId, name);
                     break;
 
-//                case "/mydata":
-////                    userService.getByChatId(update.getMessage());
-//                    break;
+                case "/register":
+                    register(chatId);
+                    break;
 
                 case "/help":
                     sendMessage(chatId, HELP_TEXT);
@@ -75,6 +83,69 @@ public class TelegramBotService extends TelegramLongPollingBot {
                 default:
                     sendMessage(chatId, "Sorry, command was not recognized ...");
             }
+        } else if (update.hasCallbackQuery()) {
+            String callbackQuery = update.getCallbackQuery().getData();
+            long messageId = update.getCallbackQuery().getMessage().getMessageId();
+            long chatId = update.getCallbackQuery().getMessage().getChatId();
+
+            if (callbackQuery.equals(YES_BUTTON)) {
+                String text = "You pressed YES button";
+                EditMessageText editMessageText = new EditMessageText();
+                editMessageText.setChatId(chatId);
+                editMessageText.setText(text);
+                editMessageText.setMessageId((int) messageId);
+
+                try {
+                    execute(editMessageText);
+                } catch (TelegramApiException exception) {
+//            throw new RuntimeException("Error!");
+                    log.error("Error occurred: {}", exception.getMessage());
+                }
+            } else if (callbackQuery.equals(NO_BUTTON)) {
+                String text = "You pressed NO Button";
+                EditMessageText editMessageText = new EditMessageText();
+                editMessageText.setChatId(chatId);
+                editMessageText.setText(text);
+                editMessageText.setMessageId((int) messageId);
+                try {
+                    execute(editMessageText);
+                } catch (TelegramApiException exception) {
+//            throw new RuntimeException("Error!");
+                    log.error("Error occurred: {}", exception.getMessage());
+                }
+            }
+        }
+    }
+
+    private void register(long chatId) {
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId);
+        message.setText("Do you really want to register?");
+
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsInLineList = new ArrayList<>();
+        List<InlineKeyboardButton> rowInLine = new ArrayList<>();
+
+        var yesButton = new InlineKeyboardButton();
+        yesButton.setText("Yes");
+        yesButton.setCallbackData(YES_BUTTON);
+
+        var noButton = new InlineKeyboardButton();
+        noButton.setText("No");
+        noButton.setCallbackData(NO_BUTTON);
+
+        rowInLine.add(yesButton);
+        rowInLine.add(noButton);
+
+        rowsInLineList.add(rowInLine);
+        inlineKeyboardMarkup.setKeyboard(rowsInLineList);
+        message.setReplyMarkup(inlineKeyboardMarkup);
+
+        try {
+            execute(message);
+        } catch (TelegramApiException exception) {
+//            throw new RuntimeException("Error!");
+            log.error("Error occurred: {}", exception.getMessage());
         }
     }
 
