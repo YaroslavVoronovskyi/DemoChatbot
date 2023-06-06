@@ -18,7 +18,6 @@ public class AdvertisementService implements IAdvertisementService {
         this.advertisementRepository = advertisementRepository;
     }
 
-
     @Override
     public List<Advertisement> getAll() {
         return advertisementRepository.findAll();

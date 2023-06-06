@@ -1,5 +1,6 @@
 package com.gmail.voronovskyi.yaroslav.chatbot.config;
 
+import com.gmail.voronovskyi.yaroslav.chatbot.Constants;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class BotInitializer {
         try {
             telegramBotsApi.registerBot((LongPollingBot) bot);
         } catch (TelegramApiException exception) {
-            log.error("Error occurred: {}", exception.getMessage());
+            log.error(Constants.ERROR_MESSAGE, exception.getMessage());
         }
     }
 }
